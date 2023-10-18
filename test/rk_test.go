@@ -12,6 +12,7 @@ func TestSet(t *testing.T) {
 	mySet.Add("new")
 	mySet.Add("new")
 	mySet.Add("new2")
+	mySet.Add(true)
 
 	mySet.Print()
 	fmt.Printf("mySet.Len():%v \n", mySet.Len())
@@ -21,5 +22,16 @@ func TestSet(t *testing.T) {
 	mySet.Delete("new")
 	fmt.Printf("after mySet.Delete(\"new\"),mySet.Contains(\"new\"):%v \n", mySet.Contains("new"))
 	fmt.Printf("mySet.Len():%v \n", mySet.Len())
+	mySet.Print()
 
+	fmt.Print("==============================================================================\n\n")
+
+	newSet := set.NewSet()
+	newSet.Add(false)
+	mySet.Print()
+	newSet.Print()
+
+	fmt.Printf("after union: ")
+	mySet.Union(*newSet)
+	mySet.Print()
 }
