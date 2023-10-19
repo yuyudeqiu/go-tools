@@ -12,7 +12,7 @@ type Iterator struct { //适用于set集合的基础迭代器，因为没办法�
 
 // 使用go语言自带的map实现set,由于golang的map是用hash实现的，故这个set是hashSet
 // 此set非线程安全
-// 没有实现迭代器接口，仅测试
+// 已实现迭代器接口
 
 type nothing struct{}
 
@@ -74,12 +74,13 @@ func (firstSet *Set) Union(secondSet Set) { //求Set并集
 
 func (firstSet *Set) Intersection(secondSet Set) { //求Set交集
 	newSet := &Set{}
+	newSet.set = make(map[any]nothing)
 	for key := range secondSet.set {
 		if firstSet.Contains(key) {
 			newSet.Add(key)
 		}
 	}
-	firstSet = newSet
+	*firstSet = *newSet
 }
 
 func (set *Set) getBaseIterator() *iteratorble.BaseIterator { //获得基础迭代器内容
