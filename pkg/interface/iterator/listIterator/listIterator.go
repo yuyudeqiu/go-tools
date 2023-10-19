@@ -1,6 +1,6 @@
 package listIterator
 
-import "go-tools/pkg/Interface/iterator/baseIterator"
+import "go-tools/pkg/interface/iterator/baseIterator"
 
 type ListInterface interface { //有序集合的迭代器接口,在无序迭代器的基础上增加了若干方法
 	baseIterator.BasicInterface

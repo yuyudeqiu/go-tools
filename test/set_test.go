@@ -55,7 +55,6 @@ func TestIteratorSet(t *testing.T) { //测试set集合的迭代器，测试已�
 	newSet.Print()
 
 	it := newSet.Iterator()
-
 	for it.HasNext() {
 		element, _ := it.Next()
 		if element == 3 || element == 7 {
