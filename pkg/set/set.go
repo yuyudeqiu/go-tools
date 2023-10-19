@@ -2,15 +2,17 @@ package set
 
 import (
 	"fmt"
+	"go-tools/pkg/Interface/iterator/iteratorble"
 )
+
+type Iterator struct { //适用于set集合的基础迭代器，因为没办法调用包外的结构体作为接收者，只能再封装一层
+	*iteratorble.BaseIterator
+	set *Set
+}
 
 // 使用go语言自带的map实现set,由于golang的map是用hash实现的，故这个set是hashSet
 // 此set非线程安全
 // 没有实现迭代器接口，仅测试
-type IteratorSet struct { //set集合的迭代器
-	index int
-	set   *Set
-}
 
 type nothing struct{}
 
@@ -62,10 +64,6 @@ func (set *Set) Clear() {
 	set.set = make(map[any]nothing)
 }
 
-func mapToArray(set *Set) {
-
-}
-
 func (firstSet *Set) Union(secondSet Set) { //求Set并集
 	for key := range secondSet.set {
 		if !firstSet.Contains(key) {
@@ -84,10 +82,52 @@ func (firstSet *Set) Intersection(secondSet Set) { //求Set交集
 	firstSet = newSet
 }
 
-func (set *Set) GetIterator() *IteratorSet { //获得set接口的迭代器
-	retIterator := &IteratorSet{}
-	retIterator.set = set
-	retIterator.index = 0
+func (set *Set) getBaseIterator() *iteratorble.BaseIterator { //获得基础迭代器内容
+	retBaseIterator := &iteratorble.BaseIterator{}
 
-	return retIterator
+	elements := make([]any, 0, len(set.set))
+	for element := range set.set {
+		elements = append(elements, element)
+	}
+
+	retBaseIterator.HasNextAfterRemove = false
+	retBaseIterator.Elements = elements
+	retBaseIterator.Index = 0
+
+	return retBaseIterator
+}
+
+func (set *Set) Iterator() *Iterator { //获得set的迭代器
+	baseIterator := set.getBaseIterator()
+	retI := Iterator{baseIterator, set}
+	return &retI
+}
+
+func (its *Iterator) Next() (any, bool) {
+	if its.BaseIterator.Index >= len(its.BaseIterator.Elements) {
+		return nil, false
+	}
+
+	currentElement := its.BaseIterator.Elements[its.BaseIterator.Index]
+	its.BaseIterator.Index++
+	its.BaseIterator.HasNextAfterRemove = true
+	return currentElement, true
+}
+
+func (its *Iterator) Remove() bool {
+	if its.BaseIterator.HasNextAfterRemove == true {
+		indexOfRemoveElement := its.BaseIterator.Index - 1
+		if indexOfRemoveElement >= 0 && its.BaseIterator.Index < len(its.BaseIterator.Elements) && its.BaseIterator.HasNextAfterRemove {
+			if its.set.Delete(its.Elements[indexOfRemoveElement]) == false {
+				return false
+			}
+			its.BaseIterator.Elements = append(its.BaseIterator.Elements[:indexOfRemoveElement], its.BaseIterator.Elements[indexOfRemoveElement+1:]...)
+			return true
+		}
+	}
+	return false
+}
+
+func (its *Iterator) HasNext() bool {
+	return its.BaseIterator.Index < len(its.BaseIterator.Elements)
 }

@@ -35,3 +35,29 @@ func TestSet(t *testing.T) {
 	mySet.Union(*newSet)
 	mySet.Print()
 }
+
+func TestIteratorSet(t *testing.T) { //测试set集合的迭代器
+	newSet := set.NewSet()
+	newSet.Add(1)
+	newSet.Add(2)
+	newSet.Add(3)
+	newSet.Add(4)
+	newSet.Add(5)
+	newSet.Add(6)
+	newSet.Add(7)
+	newSet.Add(8)
+	newSet.Add(9)
+
+	it := newSet.Iterator()
+	newSet.Print()
+
+	for it.HasNext() {
+		element, _ := it.Next()
+		if element == 3 || element == 7 {
+			it.Remove()
+		}
+	}
+
+	newSet.Print()
+
+}
