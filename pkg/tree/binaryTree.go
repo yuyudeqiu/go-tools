@@ -24,7 +24,7 @@ func NewBinaryTree[T orderedtype.Ordered]() *BinaryTree[T] {
 	return &BinaryTree[T]{nil}
 }
 
-func (bt *BinaryTree[T]) Insert(data T) {
+func (bt *BinaryTree[T]) Insert(data T) { //这里的插入的方式是基于二叉搜索树的要求（右大于左）插入的
 	if bt.root == nil {
 		bt.root = &tree.Node[T]{Content: data}
 		return
@@ -154,16 +154,51 @@ func (bt *BinaryTree[T]) Clear() { //清空树节点
 	bt.root = nil
 }
 
-func (bt *BinaryTree[T]) exist(data T) {
-
-}
-
 func (bt *BinaryTree[T]) Delete(data T) {
-	deleteNode[T](bt.root, data)
+	deleteNodeWithRecursion(bt.root, data)
 }
 
-func deleteNode[T orderedtype.Ordered](node *tree.Node[T], data T) *tree.Node[T] {
+func deleteNodeWithRecursion[T orderedtype.Ordered](root *tree.Node[T], data T) *tree.Node[T] { //递归删除,性能不够好
+	if root == nil {
+		return nil
+	}
+
+	if data > root.Content {
+		root.Right = deleteNodeWithRecursion(root.Right, data)
+	} else if data > root.Content {
+		root.Left = deleteNodeWithRecursion(root.Left, data)
+	} else { //找到要删除的节点了
+
+		if root.Left == nil {
+			return root.Right
+		} else if root.Right == nil {
+			return root.Left
+		} else {
+			minNode := findMinNodeOnRight(root)
+			root.Content = minNode.Content
+			root.Right = deleteNodeWithRecursion(root.Right, minNode.Content)
+		}
+
+	}
+	return root
+}
+
+func deleteNodeWithoutRecursion[T orderedtype.Ordered](root *tree.Node[T], data T) *tree.Node[T] { //非递归删除
+	//非递归删除其实就是找到要删除的节点，根据要删除节点的三种情况进行删除，还没写完
+	if root == nil {
+		return root
+	}
+	return root
+
+}
+
+func findMinNodeOnRight[T orderedtype.Ordered](node *tree.Node[T]) *tree.Node[T] { //寻找后继节点
 	if node == nil {
 		return nil
 	}
+	node = node.Right
+	for node.Left != nil {
+		node = node.Left
+	}
+	return node
 }
